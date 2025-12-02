@@ -1,0 +1,146 @@
+<div class="max-w-5xl mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold mb-8">Checkout</h1>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Checkout Form -->
+    <div class="lg:col-span-2">
+      <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-4">Shipping Information</h2>
+
+        <div class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+              <input type="text" value="<%= @customer.first_name %>" readonly class="w-full px-3 py-2 border rounded-lg bg-gray-50">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+              <input type="text" value="<%= @customer.last_name %>" readonly class="w-full px-3 py-2 border rounded-lg bg-gray-50">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input type="email" value="<%= @customer.email %>" readonly class="w-full px-3 py-2 border rounded-lg bg-gray-50">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+            <input type="tel" value="<%= @customer.phone %>" readonly class="w-full px-3 py-2 border rounded-lg bg-gray-50">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+            <input type="text" value="<%= @customer.address %>" readonly class="w-full px-3 py-2 border rounded-lg bg-gray-50">
+          </div>
+
+          <div class="grid grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
+              <input type="text" value="<%= @customer.city %>" readonly class="w-full px-3 py-2 border rounded-lg bg-gray-50">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Province</label>
+              <input type="text" value="<%= @customer.province.name %>" readonly class="w-full px-3 py-2 border rounded-lg bg-gray-50">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Postal Code</label>
+              <input type="text" value="<%= @customer.postal_code %>" readonly class="w-full px-3 py-2 border rounded-lg bg-gray-50">
+            </div>
+          </div>
+
+          <div class="pt-2">
+            <%= link_to "Update Profile", edit_profile_path, class: "text-blue-600 hover:underline text-sm" %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Information -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-semibold mb-4">Payment Information</h2>
+
+        <%= form_with model: @order, url: orders_path, method: :post do |f| %>
+          <%= f.hidden_field :shipping_address, value: @customer.full_address %>
+
+          <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg mb-4">
+            <p class="text-sm text-blue-800">
+              <strong>Test Mode:</strong> This is a demo checkout. In production, Stripe payment integration would be here.
+            </p>
+          </div>
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
+              <input type="text" placeholder="4242 4242 4242 4242" class="w-full px-3 py-2 border rounded-lg">
+            </div>
+
+            <div class="grid grid-cols-3 gap-4">
+              <div class="col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
+                <input type="text" placeholder="MM / YY" class="w-full px-3 py-2 border rounded-lg">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">CVV</label>
+                <input type="text" placeholder="123" class="w-full px-3 py-2 border rounded-lg">
+              </div>
+            </div>
+          </div>
+
+          <%= f.submit "Place Order", class: "w-full mt-6 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 cursor-pointer" %>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Order Summary -->
+    <div>
+      <div class="bg-white rounded-lg shadow p-6 sticky top-4">
+        <h2 class="text-xl font-semibold mb-4">Order Summary</h2>
+
+        <div class="space-y-4 mb-6">
+          <% @cart_items.each do |item| %>
+            <div class="flex gap-3">
+              <div class="w-16 h-16 bg-gray-200 rounded flex-shrink-0">
+                <% if item.product.images.attached? %>
+                  <%= image_tag item.product.images.first, class: "w-full h-full object-cover rounded" %>
+                <% end %>
+              </div>
+              <div class="flex-1">
+                <div class="font-medium text-sm"><%= item.product.name %></div>
+                <div class="text-gray-600 text-sm">Qty: <%= item.quantity %></div>
+              </div>
+              <div class="text-right">
+                <div class="font-semibold">$<%= number_with_precision(item.subtotal, precision: 2) %></div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="border-t pt-4 space-y-2">
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">Subtotal</span>
+            <span class="font-semibold">$<%= number_with_precision(@subtotal, precision: 2) %></span>
+          </div>
+
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-600">
+              Tax (<%= @customer.province.code %>:
+              <% if @customer.province.hst_rate > 0 %>
+                <%= number_with_precision(@customer.province.hst_rate, precision: 2) %>% HST
+              <% else %>
+                <%= number_with_precision(@customer.province.gst_rate, precision: 2) %>% GST +
+                <%= number_with_precision(@customer.province.pst_rate, precision: 2) %>% PST
+              <% end %>
+              )
+            </span>
+            <span class="font-semibold">$<%= number_with_precision(@tax_amount, precision: 2) %></span>
+          </div>
+
+          <div class="border-t pt-2 flex justify-between">
+            <span class="font-bold text-lg">Total</span>
+            <span class="font-bold text-2xl text-blue-600">$<%= number_with_precision(@total, precision: 2) %></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
