@@ -1,7 +1,6 @@
-
 class OrdersController < ApplicationController
   before_action :authenticate_user!
-  before_action :ensure_customer_profile, only: [:new, :create]
+  before_action :ensure_customer_profile
 
   def index
     @orders = current_user.customer.orders.order(created_at: :desc)
@@ -62,10 +61,7 @@ class OrdersController < ApplicationController
       @order.calculate_totals
       @order.save!
 
-      # Process payment (placeholder - integrate Stripe here)
-      # payment_result = process_stripe_payment(@order)
-
-      # For now, mark as paid
+      # For now, mark as paid (Stripe integration would go here)
       @order.update!(status: :paid)
 
       # Clear cart
@@ -83,12 +79,12 @@ class OrdersController < ApplicationController
 
   def ensure_customer_profile
     unless current_user.customer.present?
-      flash[:alert] = "Please complete your profile before placing an order."
+      flash[:alert] = "Please complete your profile before placing orders."
       redirect_to new_profile_path
     end
   end
 
   def order_params
-    params.require(:order).permit(:shipping_address)
+    params.require(:order).permit(:shipping_address) if params[:order].present?
   end
 end

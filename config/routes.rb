@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-devise_for :users
+  devise_for :users
 
   # Admin namespace
   namespace :admin do
@@ -28,5 +28,5 @@ devise_for :users
   resources :orders, only: [:index, :show, :new, :create]
 
   # Customer profile
-  resource :profile, only: [:show, :edit, :update]
+  resource :profile, only: [:show, :new, :create, :edit, :update]
 end
