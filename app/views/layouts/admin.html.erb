@@ -6,13 +6,14 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
   <body class="bg-gray-100">
     <div class="min-h-screen flex">
       <!-- Sidebar -->
-      <div class="w-64 bg-gray-900 text-white">
+      <div class="w-64 bg-gray-900 text-white flex-shrink-0">
         <div class="p-6">
           <h1 class="text-2xl font-bold">Laundering Laundry</h1>
           <p class="text-sm text-gray-400">Admin Panel</p>
@@ -23,23 +24,23 @@
             <span>Dashboard</span>
           <% end %>
 
-          <%= link_to admin_products_path, class: "flex items-center px-6 py-3 hover:bg-gray-800 #{'bg-gray-800' if controller_name == 'products'}" do %>
+          <%= link_to admin_products_path, class: "flex items-center px-6 py-3 hover:bg-gray-800 #{'bg-gray-800' if controller_name == 'products' && params[:controller].include?('admin')}" do %>
             <span>Products</span>
           <% end %>
 
-          <%= link_to admin_categories_path, class: "flex items-center px-6 py-3 hover:bg-gray-800 #{'bg-gray-800' if controller_name == 'categories'}" do %>
+          <%= link_to admin_categories_path, class: "flex items-center px-6 py-3 hover:bg-gray-800 #{'bg-gray-800' if controller_name == 'categories' && params[:controller].include?('admin')}" do %>
             <span>Categories</span>
           <% end %>
 
-          <%= link_to admin_orders_path, class: "flex items-center px-6 py-3 hover:bg-gray-800 #{'bg-gray-800' if controller_name == 'orders'}" do %>
+          <%= link_to admin_orders_path, class: "flex items-center px-6 py-3 hover:bg-gray-800 #{'bg-gray-800' if controller_name == 'orders' && params[:controller].include?('admin')}" do %>
             <span>Orders</span>
           <% end %>
 
-          <%= link_to admin_customers_path, class: "flex items-center px-6 py-3 hover:bg-gray-800 #{'bg-gray-800' if controller_name == 'customers'}" do %>
+          <%= link_to admin_customers_path, class: "flex items-center px-6 py-3 hover:bg-gray-800 #{'bg-gray-800' if controller_name == 'customers' && params[:controller].include?('admin')}" do %>
             <span>Customers</span>
           <% end %>
 
-          <%= link_to admin_provinces_path, class: "flex items-center px-6 py-3 hover:bg-gray-800 #{'bg-gray-800' if controller_name == 'provinces'}" do %>
+          <%= link_to admin_provinces_path, class: "flex items-center px-6 py-3 hover:bg-gray-800 #{'bg-gray-800' if controller_name == 'provinces' && params[:controller].include?('admin')}" do %>
             <span>Tax Rates</span>
           <% end %>
 
@@ -56,7 +57,7 @@
       </div>
 
       <!-- Main Content -->
-      <div class="flex-1">
+      <div class="flex-1 flex flex-col min-h-screen">
         <!-- Header -->
         <header class="bg-white shadow">
           <div class="px-8 py-4">
@@ -83,7 +84,7 @@
         <% end %>
 
         <!-- Page Content -->
-        <main class="p-8">
+        <main class="p-8 flex-1">
           <%= yield %>
         </main>
       </div>
