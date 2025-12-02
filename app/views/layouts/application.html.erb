@@ -1,30 +1,156 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Laundering Laundry" %></title>
+    <title>Laundering Laundry - Premium Garments Online</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-
-    <%= yield :head %>
-
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
-
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
-    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <main class="container mx-auto mt-28 px-5 flex">
+  <body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+          <div class="flex items-center">
+            <%= link_to root_path, class: "text-2xl font-bold text-gray-900" do %>
+              Laundering Laundry
+            <% end %>
+
+            <div class="hidden md:flex ml-10 space-x-8">
+              <%= link_to "Shop All", products_path, class: "text-gray-700 hover:text-gray-900" %>
+
+              <% Category.limit(4).each do |category| %>
+                <%= link_to category.name, category_path(category), class: "text-gray-700 hover:text-gray-900" %>
+              <% end %>
+            </div>
+          </div>
+
+          <!-- Search Bar -->
+          <div class="hidden md:flex items-center flex-1 max-w-md mx-8">
+            <%= form_with url: products_path, method: :get, class: "w-full" do |f| %>
+              <div class="relative">
+                <%= f.text_field :search,
+                    placeholder: "Search products...",
+                    value: params[:search],
+                    class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+              </div>
+            <% end %>
+          </div>
+
+          <div class="flex items-center space-x-4">
+            <% if user_signed_in? %>
+              <%= link_to cart_path, class: "text-gray-700 hover:text-gray-900 relative" do %>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+                <% if current_user.cart_items.any? %>
+                  <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    <%= current_user.cart_items.count %>
+                  </span>
+                <% end %>
+              <% end %>
+
+              <div class="relative group">
+                <button class="text-gray-700 hover:text-gray-900 flex items-center">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                  </svg>
+                </button>
+
+                <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block">
+                  <%= link_to "My Profile", profile_path, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
+                  <%= link_to "My Orders", orders_path, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
+                  <% if current_user.admin? %>
+                    <%= link_to "Admin Dashboard", admin_root_path, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
+                  <% end %>
+                  <%= link_to "Logout", destroy_user_session_path, data: { turbo_method: :delete }, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
+                </div>
+              </div>
+            <% else %>
+              <%= link_to "Login", new_user_session_path, class: "text-gray-700 hover:text-gray-900" %>
+              <%= link_to "Sign Up", new_user_registration_path, class: "bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Search -->
+      <div class="md:hidden px-4 pb-3">
+        <%= form_with url: products_path, method: :get do |f| %>
+          <%= f.text_field :search,
+              placeholder: "Search products...",
+              value: params[:search],
+              class: "w-full px-4 py-2 border border-gray-300 rounded-lg" %>
+        <% end %>
+      </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    <% if flash[:notice] %>
+      <div class="max-w-7xl mx-auto px-4 mt-4">
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+          <%= flash[:notice] %>
+        </div>
+      </div>
+    <% end %>
+
+    <% if flash[:alert] %>
+      <div class="max-w-7xl mx-auto px-4 mt-4">
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          <%= flash[:alert] %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Main Content -->
+    <main>
       <%= yield %>
     </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white mt-20">
+      <div class="max-w-7xl mx-auto px-4 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div>
+            <h3 class="text-lg font-semibold mb-4">Laundering Laundry</h3>
+            <p class="text-gray-400">Premium garments for the modern wardrobe.</p>
+          </div>
+
+          <div>
+            <h4 class="text-lg font-semibold mb-4">Shop</h4>
+            <ul class="space-y-2 text-gray-400">
+              <% Category.limit(4).each do |category| %>
+                <li><%= link_to category.name, category_path(category), class: "hover:text-white" %></li>
+              <% end %>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="text-lg font-semibold mb-4">Customer Service</h4>
+            <ul class="space-y-2 text-gray-400">
+              <li><a href="#" class="hover:text-white">Contact Us</a></li>
+              <li><a href="#" class="hover:text-white">Shipping Info</a></li>
+              <li><a href="#" class="hover:text-white">Returns</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="text-lg font-semibold mb-4">Follow Us</h4>
+            <div class="flex space-x-4 text-gray-400">
+              <a href="#" class="hover:text-white">Facebook</a>
+              <a href="#" class="hover:text-white">Instagram</a>
+              <a href="#" class="hover:text-white">Twitter</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+          <p>&copy; <%= Time.current.year %> Laundering Laundry. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
   </body>
 </html>
