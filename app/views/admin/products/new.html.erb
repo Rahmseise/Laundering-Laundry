@@ -1,0 +1,87 @@
+<% content_for :page_title, "Add New Product" %>
+
+<div class="max-w-3xl">
+  <div class="bg-white rounded-lg shadow p-6">
+    <%= form_with model: [:admin, @product], class: "space-y-6" do |f| %>
+      <div>
+        <%= f.label :name, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.text_field :name, required: true, class: "w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" %>
+        <% if @product.errors[:name].any? %>
+          <p class="text-red-600 text-sm mt-1"><%= @product.errors[:name].first %></p>
+        <% end %>
+      </div>
+
+      <div>
+        <%= f.label :description, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.text_area :description, rows: 4, required: true, class: "w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" %>
+        <% if @product.errors[:description].any? %>
+          <p class="text-red-600 text-sm mt-1"><%= @product.errors[:description].first %></p>
+        <% end %>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <%= f.label :category_id, "Category", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= f.collection_select :category_id, @categories, :id, :name,
+              { prompt: "Select Category" },
+              { required: true, class: "w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" } %>
+        </div>
+
+        <div>
+          <%= f.label :sku, "SKU", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= f.text_field :sku, required: true, class: "w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" %>
+          <% if @product.errors[:sku].any? %>
+            <p class="text-red-600 text-sm mt-1"><%= @product.errors[:sku].first %></p>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <%= f.label :price, class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= f.number_field :price, step: 0.01, required: true, class: "w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" %>
+          <% if @product.errors[:price].any? %>
+            <p class="text-red-600 text-sm mt-1"><%= @product.errors[:price].first %></p>
+          <% end %>
+        </div>
+
+        <div>
+          <%= f.label :stock_quantity, "Stock", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= f.number_field :stock_quantity, required: true, class: "w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" %>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <%= f.check_box :on_sale, class: "rounded", id: "product_on_sale" %>
+        <%= f.label :on_sale, "On Sale", class: "text-sm font-medium text-gray-700" %>
+      </div>
+
+      <div id="sale-price-field" style="display: none;">
+        <%= f.label :sale_price, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.number_field :sale_price, step: 0.01, class: "w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" %>
+      </div>
+
+      <div>
+        <%= f.label :images, "Product Images", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.file_field :images, multiple: true, accept: "image/*", class: "w-full px-3 py-2 border rounded-lg" %>
+        <p class="text-sm text-gray-500 mt-1">You can select multiple images</p>
+      </div>
+
+      <div class="flex gap-4">
+        <%= f.submit "Create Product", class: "bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 cursor-pointer" %>
+        <%= link_to "Cancel", admin_products_path, class: "px-6 py-2 border rounded-lg hover:bg-gray-50" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const checkbox = document.getElementById('product_on_sale');
+    const salePriceField = document.getElementById('sale-price-field');
+
+    checkbox.addEventListener('change', function() {
+      salePriceField.style.display = this.checked ? 'block' : 'none';
+    });
+  });
+</script>

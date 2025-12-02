@@ -1,0 +1,96 @@
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <!-- Filters -->
+  <div class="mb-8 flex flex-wrap gap-4">
+    <%= link_to "All Products", products_path,
+        class: "px-4 py-2 rounded-lg #{params[:filter].blank? ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border'}" %>
+    <%= link_to "On Sale", products_path(filter: 'on_sale'),
+        class: "px-4 py-2 rounded-lg #{params[:filter] == 'on_sale' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border'}" %>
+    <%= link_to "New Arrivals", products_path(filter: 'new'),
+        class: "px-4 py-2 rounded-lg #{params[:filter] == 'new' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border'}" %>
+    <%= link_to "Recently Updated", products_path(filter: 'recently_updated'),
+        class: "px-4 py-2 rounded-lg #{params[:filter] == 'recently_updated' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border'}" %>
+  </div>
+
+  <!-- Category Filter -->
+  <div class="mb-6">
+    <%= form_with url: products_path, method: :get, class: "flex gap-2" do |f| %>
+      <%= f.select :category_id,
+          options_from_collection_for_select(@categories, :id, :name, params[:category_id]),
+          { include_blank: "All Categories" },
+          class: "px-4 py-2 border rounded-lg" %>
+      <%= f.hidden_field :search, value: params[:search] %>
+      <%= f.hidden_field :filter, value: params[:filter] %>
+      <%= f.submit "Filter", class: "px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer" %>
+    <% end %>
+  </div>
+
+  <h1 class="text-3xl font-bold mb-8">
+    <% if params[:filter].present? %>
+      <%= params[:filter].titleize %> Products
+    <% elsif params[:search].present? %>
+      Search Results for "<%= params[:search] %>"
+    <% else %>
+      All Products
+    <% end %>
+  </h1>
+
+  <% if @products.any? %>
+    <!-- Products Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <% @products.each do |product| %>
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition">
+          <%= link_to product_path(product) do %>
+            <div class="aspect-w-1 aspect-h-1 bg-gray-200">
+              <% if product.images.attached? %>
+                <%= image_tag product.images.first, class: "w-full h-64 object-cover" %>
+              <% else %>
+                <div class="w-full h-64 flex items-center justify-center text-gray-400">
+                  No Image
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+
+          <div class="p-4">
+            <div class="text-sm text-gray-500 mb-1"><%= product.category.name %></div>
+            <%= link_to product.name, product_path(product), class: "text-lg font-semibold text-gray-900 hover:text-blue-600 block mb-2" %>
+
+            <div class="flex items-center justify-between">
+              <div>
+                <% if product.on_sale? %>
+                  <span class="text-red-600 font-bold">$<%= number_with_precision(product.sale_price, precision: 2) %></span>
+                  <span class="text-gray-500 line-through ml-2">$<%= number_with_precision(product.price, precision: 2) %></span>
+                <% else %>
+                  <span class="text-gray-900 font-bold">$<%= number_with_precision(product.price, precision: 2) %></span>
+                <% end %>
+              </div>
+
+              <% if product.stock_quantity > 0 %>
+                <span class="text-green-600 text-sm">In Stock</span>
+              <% else %>
+                <span class="text-red-600 text-sm">Out of Stock</span>
+              <% end %>
+            </div>
+
+            <% if product.on_sale? %>
+              <span class="inline-block mt-2 px-2 py-1 bg-red-100 text-red-800 text-xs rounded">SALE</span>
+            <% end %>
+
+            <% if product.created_at > 3.days.ago %>
+              <span class="inline-block mt-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded">NEW</span>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Pagination -->
+    <div class="mt-8">
+      <%= paginate @products %>
+    </div>
+  <% else %>
+    <div class="text-center py-12">
+      <p class="text-gray-500 text-lg">No products found.</p>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,32 @@
+<div class="max-w-2xl mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold">My Profile</h1>
+    <%= link_to "Edit Profile", edit_profile_path, class: "bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" %>
+  </div>
+
+  <div class="bg-white rounded-lg shadow p-6">
+    <div class="space-y-4">
+      <div>
+        <label class="text-sm font-medium text-gray-500">Name</label>
+        <p class="text-lg"><%= @customer.full_name %></p>
+      </div>
+
+      <div>
+        <label class="text-sm font-medium text-gray-500">Email</label>
+        <p class="text-lg"><%= @customer.email %></p>
+      </div>
+
+      <% if @customer.phone.present? %>
+        <div>
+          <label class="text-sm font-medium text-gray-500">Phone</label>
+          <p class="text-lg"><%= @customer.phone %></p>
+        </div>
+      <% end %>
+
+      <div>
+        <label class="text-sm font-medium text-gray-500">Address</label>
+        <p class="text-lg"><%= @customer.full_address %></p>
+      </div>
+    </div>
+  </div>
+</div>

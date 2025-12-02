@@ -1,0 +1,56 @@
+<% content_for :page_title, "Orders" %>
+
+<div class="mb-6">
+  <div class="flex gap-2">
+    <%= link_to "All", admin_orders_path, class: "px-4 py-2 rounded-lg #{params[:status].blank? ? 'bg-blue-600 text-white' : 'bg-white border'}" %>
+    <%= link_to "Pending", admin_orders_path(status: 'pending'), class: "px-4 py-2 rounded-lg #{params[:status] == 'pending' ? 'bg-blue-600 text-white' : 'bg-white border'}" %>
+    <%= link_to "Paid", admin_orders_path(status: 'paid'), class: "px-4 py-2 rounded-lg #{params[:status] == 'paid' ? 'bg-blue-600 text-white' : 'bg-white border'}" %>
+    <%= link_to "Shipped", admin_orders_path(status: 'shipped'), class: "px-4 py-2 rounded-lg #{params[:status] == 'shipped' ? 'bg-blue-600 text-white' : 'bg-white border'}" %>
+  </div>
+</div>
+
+<div class="bg-white rounded-lg shadow overflow-hidden">
+  <table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-gray-50">
+      <tr>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order ID</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-200">
+      <% @orders.each do |order| %>
+        <tr>
+          <td class="px-6 py-4 font-medium">#<%= order.id %></td>
+          <td class="px-6 py-4">
+            <div class="font-medium"><%= order.customer.full_name %></div>
+            <div class="text-sm text-gray-500"><%= order.customer.email %></div>
+          </td>
+          <td class="px-6 py-4 text-sm"><%= order.created_at.strftime("%b %d, %Y") %></td>
+          <td class="px-6 py-4 font-semibold">$<%= number_with_precision(order.total, precision: 2) %></td>
+          <td class="px-6 py-4">
+            <span class="px-3 py-1 rounded-full text-xs font-semibold
+              <%= case order.status
+                  when 'paid' then 'bg-green-100 text-green-800'
+                  when 'shipped' then 'bg-blue-100 text-blue-800'
+                  when 'delivered' then 'bg-purple-100 text-purple-800'
+                  else 'bg-yellow-100 text-yellow-800'
+                  end %>">
+              <%= order.status.titleize %>
+            </span>
+          </td>
+          <td class="px-6 py-4">
+            <%= link_to "View Details", admin_order_path(order), class: "text-blue-600 hover:underline" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="mt-4">
+  <%= paginate @orders %>
+</div>

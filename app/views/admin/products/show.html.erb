@@ -1,0 +1,61 @@
+<% content_for :page_title, "Product Details" %>
+
+<div class="max-w-4xl">
+  <div class="bg-white rounded-lg shadow p-6 mb-6">
+    <div class="flex justify-between items-start mb-6">
+      <h2 class="text-2xl font-bold"><%= @product.name %></h2>
+      <div class="flex gap-2">
+        <%= link_to "Edit", edit_admin_product_path(@product), class: "bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" %>
+        <%= link_to "Delete", admin_product_path(@product), data: { turbo_method: :delete, turbo_confirm: "Are you sure?" }, class: "bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700" %>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-6">
+      <div>
+        <% if @product.images.attached? %>
+          <%= image_tag @product.images.first, class: "w-full h-64 object-cover rounded-lg" %>
+        <% else %>
+          <div class="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400">
+            No Image
+          </div>
+        <% end %>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="text-sm font-medium text-gray-500">SKU</label>
+          <p class="text-lg"><%= @product.sku %></p>
+        </div>
+
+        <div>
+          <label class="text-sm font-medium text-gray-500">Category</label>
+          <p class="text-lg"><%= @product.category.name %></p>
+        </div>
+
+        <div>
+          <label class="text-sm font-medium text-gray-500">Price</label>
+          <p class="text-lg font-bold">$<%= number_with_precision(@product.price, precision: 2) %></p>
+        </div>
+
+        <% if @product.on_sale? %>
+          <div>
+            <label class="text-sm font-medium text-gray-500">Sale Price</label>
+            <p class="text-lg font-bold text-red-600">$<%= number_with_precision(@product.sale_price, precision: 2) %></p>
+          </div>
+        <% end %>
+
+        <div>
+          <label class="text-sm font-medium text-gray-500">Stock Quantity</label>
+          <p class="text-lg <%= @product.stock_quantity < 10 ? 'text-red-600' : '' %>"><%= @product.stock_quantity %></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-6">
+      <label class="text-sm font-medium text-gray-500">Description</label>
+      <p class="text-gray-700 mt-1"><%= @product.description %></p>
+    </div>
+  </div>
+
+  <%= link_to "← Back to Products", admin_products_path, class: "text-blue-600 hover:underline" %>
+</div>

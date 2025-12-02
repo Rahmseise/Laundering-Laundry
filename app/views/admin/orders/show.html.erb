@@ -1,0 +1,95 @@
+<% content_for :page_title, "Order ##{@order.id}" %>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <div class="lg:col-span-2 space-y-6">
+    <!-- Order Items -->
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-lg font-semibold mb-4">Order Items</h2>
+      <div class="space-y-4">
+        <% @order_items.each do |item| %>
+          <div class="flex gap-4 pb-4 border-b last:border-0">
+            <div class="w-16 h-16 bg-gray-200 rounded flex-shrink-0">
+              <% if item.product.images.attached? %>
+                <%= image_tag item.product.images.first, class: "w-full h-full object-cover rounded" %>
+              <% end %>
+            </div>
+            <div class="flex-1">
+              <div class="font-semibold"><%= item.product_name %></div>
+              <div class="text-sm text-gray-600">Quantity: <%= item.quantity %></div>
+              <div class="text-sm text-gray-600">$<%= number_with_precision(item.price, precision: 2) %> each</div>
+            </div>
+            <div class="font-semibold">
+              $<%= number_with_precision(item.price * item.quantity, precision: 2) %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Customer Info -->
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-lg font-semibold mb-4">Customer Information</h2>
+      <div class="space-y-2 text-gray-700">
+        <p><strong>Name:</strong> <%= @order.customer.full_name %></p>
+        <p><strong>Email:</strong> <%= @order.customer.email %></p>
+        <% if @order.customer.phone.present? %>
+          <p><strong>Phone:</strong> <%= @order.customer.phone %></p>
+        <% end %>
+        <p><strong>Shipping:</strong> <%= @order.shipping_address %></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="space-y-6">
+    <!-- Order Summary -->
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-lg font-semibold mb-4">Order Summary</h2>
+      <div class="space-y-2">
+        <div class="flex justify-between">
+          <span class="text-gray-600">Subtotal</span>
+          <span>$<%= number_with_precision(@order.subtotal, precision: 2) %></span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-600">Tax</span>
+          <span>$<%= number_with_precision(@order.tax_amount, precision: 2) %></span>
+        </div>
+        <div class="border-t pt-2 flex justify-between font-bold text-lg">
+          <span>Total</span>
+          <span>$<%= number_with_precision(@order.total, precision: 2) %></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Status -->
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-lg font-semibold mb-4">Order Status</h2>
+      <div class="mb-4">
+        <span class="px-4 py-2 rounded-full text-sm font-semibold
+          <%= case @order.status
+              when 'paid' then 'bg-green-100 text-green-800'
+              when 'shipped' then 'bg-blue-100 text-blue-800'
+              else 'bg-yellow-100 text-yellow-800'
+              end %>">
+          <%= @order.status.titleize %>
+        </span>
+      </div>
+
+      <div class="space-y-2">
+        <% if @order.pending? %>
+          <%= button_to "Mark as Paid", update_status_admin_order_path(@order, status: 'paid'),
+              method: :patch, class: "w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700" %>
+        <% end %>
+
+        <% if @order.paid? %>
+          <%= button_to "Mark as Shipped", update_status_admin_order_path(@order, status: 'shipped'),
+              method: :patch, class: "w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" %>
+        <% end %>
+
+        <% if @order.shipped? %>
+          <%= button_to "Mark as Delivered", update_status_admin_order_path(@order, status: 'delivered'),
+              method: :patch, class: "w-full bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

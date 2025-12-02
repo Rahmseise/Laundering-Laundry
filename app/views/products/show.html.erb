@@ -13,14 +13,6 @@
         <div class="bg-gray-200 rounded-lg mb-4">
           <%= image_tag @product.images.first, class: "w-full h-96 object-cover rounded-lg" %>
         </div>
-
-        <% if @product.images.count > 1 %>
-          <div class="grid grid-cols-4 gap-4">
-            <% @product.images.each do |image| %>
-              <%= image_tag image, class: "w-full h-24 object-cover rounded-lg cursor-pointer hover:opacity-75" %>
-            <% end %>
-          </div>
-        <% end %>
       <% else %>
         <div class="bg-gray-200 h-96 rounded-lg flex items-center justify-center text-gray-400">
           No Image Available
@@ -40,9 +32,6 @@
         <% if @product.on_sale? %>
           <span class="text-3xl font-bold text-red-600">$<%= number_with_precision(@product.sale_price, precision: 2) %></span>
           <span class="text-xl text-gray-500 line-through ml-3">$<%= number_with_precision(@product.price, precision: 2) %></span>
-          <span class="ml-3 px-3 py-1 bg-red-100 text-red-800 text-sm rounded">
-            <%= number_to_percentage(((@product.price - @product.sale_price) / @product.price) * 100, precision: 0) %> OFF
-          </span>
         <% else %>
           <span class="text-3xl font-bold text-gray-900">$<%= number_with_precision(@product.price, precision: 2) %></span>
         <% end %>
@@ -82,21 +71,6 @@
       <% elsif !user_signed_in? %>
         <div class="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
           <%= link_to "Sign in", new_user_session_path, class: "text-blue-600 hover:underline" %> to add items to cart
-        </div>
-      <% end %>
-
-      <!-- Related Products -->
-      <% if @related_products.any? %>
-        <div class="mt-8 pt-8 border-t">
-          <h3 class="text-xl font-semibold mb-4">More from <%= @product.category.name %></h3>
-          <div class="grid grid-cols-2 gap-4">
-            <% @related_products.each do |related| %>
-              <div class="border rounded-lg p-3 hover:shadow-lg transition">
-                <%= link_to related.name, product_path(related), class: "text-sm font-semibold hover:text-blue-600" %>
-                <div class="text-sm text-gray-600 mt-1">$<%= number_with_precision(related.current_price, precision: 2) %></div>
-              </div>
-            <% end %>
-          </div>
         </div>
       <% end %>
     </div>
