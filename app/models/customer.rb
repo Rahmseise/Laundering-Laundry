@@ -1,6 +1,6 @@
 class Customer < ApplicationRecord
   belongs_to :user
-  belongs_to :province
+  belongs_to :province, optional: true
   has_many :orders, dependent: :destroy
 
   validates :first_name, :last_name, presence: true
@@ -12,6 +12,9 @@ class Customer < ApplicationRecord
   end
 
   def full_address
-    [address, city, province.name, postal_code].compact.join(', ')
+    parts = [address, city]
+    parts << province.name if province.present?
+    parts << postal_code
+    parts.compact.join(', ')
   end
 end
