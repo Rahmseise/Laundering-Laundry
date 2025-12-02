@@ -1,0 +1,82 @@
+<% content_for :page_title, "Dashboard" %>
+
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+  <div class="bg-white rounded-lg shadow p-6">
+    <div class="text-gray-500 text-sm">Total Products</div>
+    <div class="text-3xl font-bold text-gray-800"><%= @total_products %></div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow p-6">
+    <div class="text-gray-500 text-sm">Total Orders</div>
+    <div class="text-3xl font-bold text-gray-800"><%= @total_orders %></div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow p-6">
+    <div class="text-gray-500 text-sm">Total Customers</div>
+    <div class="text-3xl font-bold text-gray-800"><%= @total_customers %></div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow p-6">
+    <div class="text-gray-500 text-sm">Total Revenue</div>
+    <div class="text-3xl font-bold text-gray-800">$<%= number_with_precision(@total_revenue, precision: 2) %></div>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <!-- Recent Orders -->
+  <div class="bg-white rounded-lg shadow">
+    <div class="px-6 py-4 border-b">
+      <h3 class="text-lg font-semibold">Recent Orders</h3>
+    </div>
+    <div class="p-6">
+      <% if @recent_orders.any? %>
+        <div class="space-y-3">
+          <% @recent_orders.each do |order| %>
+            <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+              <div>
+                <div class="font-semibold">#<%= order.id %></div>
+                <div class="text-sm text-gray-600"><%= order.customer.full_name %></div>
+              </div>
+              <div class="text-right">
+                <div class="font-semibold">$<%= number_with_precision(order.total, precision: 2) %></div>
+                <span class="text-xs px-2 py-1 rounded <%= order.paid? ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' %>">
+                  <%= order.status.titleize %>
+                </span>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-gray-500">No orders yet.</p>
+      <% end %>
+
+      <%= link_to 'View All Orders', admin_orders_path, class: "block mt-4 text-blue-600 hover:text-blue-800 text-center" %>
+    </div>
+  </div>
+
+  <!-- Low Stock Alert -->
+  <div class="bg-white rounded-lg shadow">
+    <div class="px-6 py-4 border-b">
+      <h3 class="text-lg font-semibold">Low Stock Alert</h3>
+    </div>
+    <div class="p-6">
+      <% if @low_stock_products.any? %>
+        <div class="space-y-3">
+          <% @low_stock_products.limit(5).each do |product| %>
+            <div class="flex justify-between items-center p-3 bg-red-50 rounded">
+              <div>
+                <div class="font-semibold"><%= product.name %></div>
+                <div class="text-sm text-gray-600"><%= product.category.name %></div>
+              </div>
+              <div class="text-right">
+                <span class="text-red-600 font-bold"><%= product.stock_quantity %> left</span>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-gray-500">All products are well stocked.</p>
+      <% end %>
+    </div>
+  </div>
+</div>
