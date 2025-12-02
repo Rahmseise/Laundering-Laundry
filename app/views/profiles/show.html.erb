@@ -13,7 +13,7 @@
 
       <div>
         <label class="text-sm font-medium text-gray-500">Email</label>
-        <p class="text-lg"><%= @customer.email %></p>
+        <p class="text-lg"><%= current_user.email %></p>
       </div>
 
       <% if @customer.phone.present? %>

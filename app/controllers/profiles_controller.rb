@@ -1,5 +1,6 @@
 class ProfilesController < ApplicationController
   before_action :authenticate_user!
+  before_action :redirect_if_admin
   before_action :set_customer, only: [:show, :edit, :update]
 
   def show
@@ -40,13 +41,20 @@ class ProfilesController < ApplicationController
 
   private
 
+  def redirect_if_admin
+    if current_user.admin?
+      flash[:alert] = "Admin users don't have customer profiles."
+      redirect_to admin_root_path
+    end
+  end
+
   def set_customer
     @customer = current_user.customer || current_user.build_customer
   end
 
   def customer_params
     params.require(:customer).permit(
-      :first_name, :last_name, :email, :phone,
+      :first_name, :last_name, :phone,
       :address, :city, :province_id, :postal_code
     )
   end
