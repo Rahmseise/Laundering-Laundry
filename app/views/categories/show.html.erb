@@ -1,0 +1,55 @@
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <!-- Breadcrumbs -->
+  <nav class="mb-6 text-sm">
+    <%= link_to "Home", root_path, class: "text-blue-600 hover:underline" %> /
+    <span class="text-gray-600"><%= @category.name %></span>
+  </nav>
+
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold mb-2"><%= @category.name %></h1>
+    <p class="text-gray-600"><%= @category.description %></p>
+  </div>
+
+  <% if @products.any? %>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <% @products.each do |product| %>
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition">
+          <%= link_to product_path(product) do %>
+            <div class="aspect-w-1 aspect-h-1 bg-gray-200">
+              <% if product.images.attached? %>
+                <%= image_tag product.images.first, class: "w-full h-64 object-cover" %>
+              <% else %>
+                <div class="w-full h-64 flex items-center justify-center text-gray-400">
+                  No Image
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+
+          <div class="p-4">
+            <%= link_to product.name, product_path(product), class: "text-lg font-semibold text-gray-900 hover:text-blue-600 block mb-2" %>
+
+            <div class="flex items-center justify-between">
+              <div>
+                <% if product.on_sale? %>
+                  <span class="text-red-600 font-bold">$<%= number_with_precision(product.sale_price, precision: 2) %></span>
+                  <span class="text-gray-500 line-through ml-2">$<%= number_with_precision(product.price, precision: 2) %></span>
+                <% else %>
+                  <span class="text-gray-900 font-bold">$<%= number_with_precision(product.price, precision: 2) %></span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="mt-8">
+      <%= paginate @products %>
+    </div>
+  <% else %>
+    <div class="text-center py-12">
+      <p class="text-gray-500 text-lg">No products in this category yet.</p>
+    </div>
+  <% end %>
+</div>

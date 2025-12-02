@@ -1,0 +1,104 @@
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <!-- Breadcrumbs -->
+  <nav class="mb-6 text-sm">
+    <%= link_to "Home", root_path, class: "text-blue-600 hover:underline" %> /
+    <%= link_to @product.category.name, category_path(@product.category), class: "text-blue-600 hover:underline" %> /
+    <span class="text-gray-600"><%= @product.name %></span>
+  </nav>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+    <!-- Product Images -->
+    <div>
+      <% if @product.images.attached? %>
+        <div class="bg-gray-200 rounded-lg mb-4">
+          <%= image_tag @product.images.first, class: "w-full h-96 object-cover rounded-lg" %>
+        </div>
+
+        <% if @product.images.count > 1 %>
+          <div class="grid grid-cols-4 gap-4">
+            <% @product.images.each do |image| %>
+              <%= image_tag image, class: "w-full h-24 object-cover rounded-lg cursor-pointer hover:opacity-75" %>
+            <% end %>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="bg-gray-200 h-96 rounded-lg flex items-center justify-center text-gray-400">
+          No Image Available
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Product Info -->
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900 mb-2"><%= @product.name %></h1>
+
+      <div class="text-sm text-gray-500 mb-4">
+        SKU: <%= @product.sku %>
+      </div>
+
+      <div class="mb-6">
+        <% if @product.on_sale? %>
+          <span class="text-3xl font-bold text-red-600">$<%= number_with_precision(@product.sale_price, precision: 2) %></span>
+          <span class="text-xl text-gray-500 line-through ml-3">$<%= number_with_precision(@product.price, precision: 2) %></span>
+          <span class="ml-3 px-3 py-1 bg-red-100 text-red-800 text-sm rounded">
+            <%= number_to_percentage(((@product.price - @product.sale_price) / @product.price) * 100, precision: 0) %> OFF
+          </span>
+        <% else %>
+          <span class="text-3xl font-bold text-gray-900">$<%= number_with_precision(@product.price, precision: 2) %></span>
+        <% end %>
+      </div>
+
+      <div class="mb-6">
+        <% if @product.stock_quantity > 0 %>
+          <span class="text-green-600 font-semibold">✓ In Stock (<%= @product.stock_quantity %> available)</span>
+        <% else %>
+          <span class="text-red-600 font-semibold">✗ Out of Stock</span>
+        <% end %>
+      </div>
+
+      <div class="mb-6">
+        <h3 class="font-semibold text-gray-900 mb-2">Description</h3>
+        <p class="text-gray-700 leading-relaxed"><%= @product.description %></p>
+      </div>
+
+      <div class="mb-6">
+        <span class="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+          <%= @product.category.name %>
+        </span>
+      </div>
+
+      <% if user_signed_in? && @product.stock_quantity > 0 %>
+        <%= form_with url: cart_items_path, method: :post, class: "mb-6" do |f| %>
+          <%= f.hidden_field :product_id, value: @product.id %>
+
+          <div class="flex items-center gap-4 mb-4">
+            <label class="font-semibold">Quantity:</label>
+            <%= f.number_field :quantity, value: 1, min: 1, max: @product.stock_quantity,
+                class: "w-20 px-3 py-2 border rounded-lg" %>
+          </div>
+
+          <%= f.submit "Add to Cart", class: "w-full bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 cursor-pointer" %>
+        <% end %>
+      <% elsif !user_signed_in? %>
+        <div class="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+          <%= link_to "Sign in", new_user_session_path, class: "text-blue-600 hover:underline" %> to add items to cart
+        </div>
+      <% end %>
+
+      <!-- Related Products -->
+      <% if @related_products.any? %>
+        <div class="mt-8 pt-8 border-t">
+          <h3 class="text-xl font-semibold mb-4">More from <%= @product.category.name %></h3>
+          <div class="grid grid-cols-2 gap-4">
+            <% @related_products.each do |related| %>
+              <div class="border rounded-lg p-3 hover:shadow-lg transition">
+                <%= link_to related.name, product_path(related), class: "text-sm font-semibold hover:text-blue-600" %>
+                <div class="text-sm text-gray-600 mt-1">$<%= number_with_precision(related.current_price, precision: 2) %></div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

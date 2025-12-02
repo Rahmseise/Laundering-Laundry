@@ -1,0 +1,71 @@
+<div class="max-w-5xl mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold mb-8">Shopping Cart</h1>
+
+  <% if @cart_items.any? %>
+    <div class="bg-white rounded-lg shadow">
+      <% @cart_items.each do |item| %>
+        <div class="flex items-center p-6 border-b">
+          <div class="w-24 h-24 bg-gray-200 rounded flex-shrink-0">
+            <% if item.product.images.attached? %>
+              <%= image_tag item.product.images.first, class: "w-full h-full object-cover rounded" %>
+            <% end %>
+          </div>
+
+          <div class="flex-1 ml-6">
+            <h3 class="text-lg font-semibold">
+              <%= link_to item.product.name, product_path(item.product), class: "hover:text-blue-600" %>
+            </h3>
+            <p class="text-gray-600 text-sm"><%= item.product.category.name %></p>
+            <p class="text-gray-900 font-semibold mt-2">$<%= number_with_precision(item.product.current_price, precision: 2) %></p>
+          </div>
+
+          <div class="flex items-center gap-6">
+            <%= form_with model: item, url: cart_item_path(item), method: :patch, class: "flex items-center gap-2" do |f| %>
+              <%= f.number_field :quantity,
+                  value: item.quantity,
+                  min: 1,
+                  max: item.product.stock_quantity,
+                  class: "w-16 px-2 py-1 border rounded" %>
+              <%= f.submit "Update", class: "px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 cursor-pointer text-sm" %>
+            <% end %>
+
+            <div class="text-right min-w-[100px]">
+              <div class="font-bold text-lg">$<%= number_with_precision(item.subtotal, precision: 2) %></div>
+            </div>
+
+            <%= button_to "Remove", cart_item_path(item),
+                method: :delete,
+                data: { confirm: "Remove this item?" },
+                class: "text-red-600 hover:text-red-800" %>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Cart Summary -->
+      <div class="p-6 bg-gray-50">
+        <div class="flex justify-between items-center mb-4">
+          <span class="text-lg font-semibold">Subtotal:</span>
+          <span class="text-2xl font-bold">$<%= number_with_precision(@subtotal, precision: 2) %></span>
+        </div>
+
+        <p class="text-sm text-gray-600 mb-4">Taxes will be calculated at checkout based on your province.</p>
+
+        <%= link_to "Proceed to Checkout", new_order_path,
+            class: "block w-full bg-blue-600 text-white text-center px-6 py-3 rounded-lg font-semibold hover:bg-blue-700" %>
+
+        <%= link_to "Continue Shopping", products_path,
+            class: "block w-full text-center mt-3 text-blue-600 hover:underline" %>
+      </div>
+    </div>
+  <% else %>
+    <div class="bg-white rounded-lg shadow p-12 text-center">
+      <svg class="w-24 h-24 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+      </svg>
+      <h2 class="text-2xl font-semibold mb-2">Your cart is empty</h2>
+      <p class="text-gray-600 mb-6">Add some products to get started!</p>
+      <%= link_to "Browse Products", products_path,
+          class: "inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700" %>
+    </div>
+  <% end %>
+</div>
