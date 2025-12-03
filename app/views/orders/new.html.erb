@@ -59,34 +59,32 @@
       <div class="bg-white rounded-lg shadow p-6">
         <h2 class="text-xl font-semibold mb-4">Payment Information</h2>
 
-        <%= form_with model: @order, url: orders_path, method: :post do |f| %>
+        <%= form_with model: @order,
+                      url: orders_path,
+                      method: :post,
+                      id: 'payment-form',
+                      data: {
+                        turbo: false,
+                        stripe_key: Rails.configuration.stripe[:publishable_key]
+                      } do |f| %>
           <%= f.hidden_field :shipping_address, value: @customer.full_address %>
 
           <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg mb-4">
             <p class="text-sm text-blue-800">
-              <strong>Test Mode:</strong> This is a demo checkout. In production, Stripe payment integration would be here.
+              <strong>Test Card:</strong> Use 4242 4242 4242 4242 with any future date and any CVV
             </p>
           </div>
 
-          <div class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
-              <input type="text" placeholder="4242 4242 4242 4242" class="w-full px-3 py-2 border rounded-lg">
-            </div>
+          <div id="card-errors" role="alert" class="text-red-600 text-sm mb-4 min-h-[20px]"></div>
 
-            <div class="grid grid-cols-3 gap-4">
-              <div class="col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
-                <input type="text" placeholder="MM / YY" class="w-full px-3 py-2 border rounded-lg">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">CVV</label>
-                <input type="text" placeholder="123" class="w-full px-3 py-2 border rounded-lg">
-              </div>
-            </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Card Information</label>
+            <div id="card-element" class="p-3 border border-gray-300 rounded-lg bg-white min-h-[40px]"></div>
           </div>
 
-          <%= f.submit "Place Order", class: "w-full mt-6 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 cursor-pointer" %>
+          <%= f.submit "Place Order",
+                       class: "w-full mt-6 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 cursor-pointer",
+                       id: "submit-button" %>
         <% end %>
       </div>
     </div>
@@ -144,3 +142,125 @@
     </div>
   </div>
 </div>
+
+<!-- Load Stripe.js -->
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+(function() {
+  'use strict';
+
+  function initStripeOnPage() {
+    const paymentForm = document.getElementById('payment-form');
+
+    // Exit if not on checkout page
+    if (!paymentForm) {
+      console.log('Payment form not found');
+      return;
+    }
+
+    // Wait for Stripe to load
+    if (typeof Stripe === 'undefined') {
+      console.log('Waiting for Stripe to load...');
+      setTimeout(initStripeOnPage, 100);
+      return;
+    }
+
+    console.log('Initializing Stripe...');
+
+    const publishableKey = paymentForm.dataset.stripeKey;
+
+    if (!publishableKey) {
+      console.error('Stripe publishable key not found');
+      return;
+    }
+
+    const stripe = Stripe(publishableKey);
+    const elements = stripe.elements();
+
+    const cardElement = elements.create('card', {
+      style: {
+        base: {
+          fontSize: '16px',
+          color: '#32325d',
+          fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          '::placeholder': {
+            color: '#aab7c4'
+          }
+        },
+        invalid: {
+          color: '#fa755a',
+          iconColor: '#fa755a'
+        }
+      }
+    });
+
+    // Check if element already mounted
+    const cardElementDiv = document.getElementById('card-element');
+    if (cardElementDiv && !cardElementDiv.classList.contains('StripeElement')) {
+      cardElement.mount('#card-element');
+      console.log('Card element mounted successfully');
+    }
+
+    // Handle real-time validation errors
+    cardElement.on('change', function(event) {
+      const errorDiv = document.getElementById('card-errors');
+      if (errorDiv) {
+        errorDiv.textContent = event.error ? event.error.message : '';
+      }
+    });
+
+    // Handle form submission
+    const submitBtn = document.getElementById('submit-button');
+
+    paymentForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      console.log('Form submitted');
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Processing Payment...';
+      submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+      try {
+        const {token, error} = await stripe.createToken(cardElement);
+
+        if (error) {
+          console.error('Stripe error:', error);
+          const errorElement = document.getElementById('card-errors');
+          errorElement.textContent = error.message;
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Place Order';
+          submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        } else {
+          console.log('Token created:', token.id);
+
+          // Add token to form
+          const hiddenInput = document.createElement('input');
+          hiddenInput.setAttribute('type', 'hidden');
+          hiddenInput.setAttribute('name', 'stripeToken');
+          hiddenInput.setAttribute('value', token.id);
+          paymentForm.appendChild(hiddenInput);
+
+          // Submit form
+          paymentForm.submit();
+        }
+      } catch (err) {
+        console.error('Error during payment:', err);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Place Order';
+        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
+    });
+  }
+
+  // Initialize on page load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initStripeOnPage);
+  } else {
+    initStripeOnPage();
+  }
+
+  // Re-initialize on Turbo navigation
+  document.addEventListener('turbo:load', initStripeOnPage);
+  document.addEventListener('turbo:render', initStripeOnPage);
+})();
+</script>
