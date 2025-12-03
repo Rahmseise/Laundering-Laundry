@@ -13,7 +13,7 @@ class Product < ApplicationRecord
 
   scope :on_sale, -> { where(on_sale: true) }
   scope :new_products, -> { where(created_at: 3.days.ago..) }
-  scope :recently_updated, -> { where('updated_at >= ? AND created_at < ?', 3.days.ago, 3.days.ago) }
+  scope :recently_updated, -> { where('updated_at >= ? AND updated_at > created_at', 3.days.ago).order(updated_at: :desc) }
   scope :in_stock, -> { where('stock_quantity > ?', 0) }
 
   def current_price
