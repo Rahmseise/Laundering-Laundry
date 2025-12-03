@@ -13,8 +13,9 @@ AllCops:
     - 'public/**/*'
     - 'test/**/*'
     - 'spec/**/*'
-
-require:
+# to use run: bundle exec rubocop
+# Use plugins instead of require
+plugins:
   - rubocop-rails
   - rubocop-performance
 
@@ -26,26 +27,26 @@ Style/Documentation:
 Style/ClassAndModuleChildren:
   Enabled: false
 
+# Disable I18n warnings (we're not using internationalization)
+Rails/I18nLocaleTexts:
+  Enabled: false
+
 # Allow longer methods for controllers
 Metrics/MethodLength:
-  Max: 35
-  Exclude:
-    - 'db/seeds.rb'
+  Max: 60
 
 # Allow more complex methods
 Metrics/AbcSize:
-  Max: 30
+  Max: 65
 
-# Allow longer blocks for routes and seeds
+# Allow longer blocks
 Metrics/BlockLength:
   Max: 50
   Exclude:
     - 'config/routes.rb'
     - 'db/seeds.rb'
-    - 'spec/**/*'
-    - 'test/**/*'
 
-# Allow longer classes for controllers
+# Allow longer classes
 Metrics/ClassLength:
   Max: 200
 
@@ -61,21 +62,10 @@ Style/FrozenStringLiteralComment:
 Style/StringLiterals:
   Enabled: false
 
-# Allow trailing commas
-Style/TrailingCommaInArrayLiteral:
+# Don't enforce database indexes for uniqueness validations
+Rails/UniqueValidationWithoutIndex:
   Enabled: false
 
-Style/TrailingCommaInHashLiteral:
-  Enabled: false
-
-# Allow guard clauses to be more flexible
-Style/GuardClause:
-  Enabled: false
-
-# Allow rescue without error class in some cases
-Style/RescueStandardError:
-  Enabled: false
-
-# Allow identical conditional branches
-Style/IdenticalConditionalBranches:
+# Don't enforce dependent option for all associations
+Rails/HasManyOrHasOneDependent:
   Enabled: false

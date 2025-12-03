@@ -19,11 +19,10 @@ class Admin::OrdersController < Admin::BaseController
   def update_status
     if @order.update(status: params[:status])
       flash[:notice] = "Order status updated to #{params[:status]}!"
-      redirect_to admin_order_path(@order)
     else
       flash[:alert] = "Error updating order status."
-      redirect_to admin_order_path(@order)
     end
+    redirect_to admin_order_path(@order)
   end
 
   private

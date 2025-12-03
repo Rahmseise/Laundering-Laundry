@@ -36,12 +36,11 @@ class Admin::CategoriesController < Admin::BaseController
   def destroy
     if @category.products.any?
       flash[:alert] = "Cannot delete category with products."
-      redirect_to admin_categories_path
     else
       @category.destroy
       flash[:notice] = "Category deleted successfully!"
-      redirect_to admin_categories_path
     end
+    redirect_to admin_categories_path
   end
 
   private
