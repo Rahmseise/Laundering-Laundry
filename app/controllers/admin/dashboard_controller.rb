@@ -5,6 +5,6 @@ class Admin::DashboardController < Admin::BaseController
     @total_customers = Customer.count
     @total_revenue = Order.paid.sum(:total)
     @recent_orders = Order.includes(:customer, :province).order(created_at: :desc).limit(10)
-    @low_stock_products = Product.where('stock_quantity < ?', 10).order(:stock_quantity)
+    @low_stock_products = Product.where(stock_quantity: ...10).order(:stock_quantity)
   end
 end

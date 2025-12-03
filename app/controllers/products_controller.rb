@@ -5,14 +5,12 @@ class ProductsController < ApplicationController
     # Search functionality
     if params[:search].present?
       @products = @products.where('name ILIKE ? OR description ILIKE ?',
-                                 "%#{params[:search]}%",
-                                 "%#{params[:search]}%")
+                                  "%#{params[:search]}%",
+                                  "%#{params[:search]}%")
     end
 
     # Filter by category
-    if params[:category_id].present?
-      @products = @products.where(category_id: params[:category_id])
-    end
+    @products = @products.where(category_id: params[:category_id]) if params[:category_id].present?
 
     # Filter options
     case params[:filter]

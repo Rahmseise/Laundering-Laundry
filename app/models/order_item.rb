@@ -11,9 +11,9 @@ class OrderItem < ApplicationRecord
   private
 
   def set_product_details
-    if product.present?
-      self.price ||= product.current_price
-      self.product_name ||= product.name
-    end
+    return if product.blank?
+
+    self.price ||= product.current_price
+    self.product_name ||= product.name
   end
 end

@@ -1,4 +1,3 @@
-
 class Order < ApplicationRecord
   belongs_to :customer
   belongs_to :province
@@ -13,6 +12,7 @@ class Order < ApplicationRecord
 
   def calculate_totals
     return unless order_items.loaded? || order_items.any?
+
     self.subtotal = order_items.sum { |item| item.price * item.quantity }
     self.tax_amount = subtotal * (province.total_tax_rate / 100)
     self.total = subtotal + tax_amount

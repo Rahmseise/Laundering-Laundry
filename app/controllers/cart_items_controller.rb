@@ -1,6 +1,6 @@
 class CartItemsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_cart_item, only: [:update, :destroy]
+  before_action :set_cart_item, only: %i[update destroy]
 
   def create
     @product = Product.find(params[:product_id])

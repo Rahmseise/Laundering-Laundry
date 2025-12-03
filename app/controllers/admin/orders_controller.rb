@@ -1,5 +1,5 @@
 class Admin::OrdersController < Admin::BaseController
-  before_action :set_order, only: [:show, :update_status]
+  before_action :set_order, only: %i[show update_status]
 
   def index
     @orders = Order.includes(:customer, :province)
@@ -7,9 +7,9 @@ class Admin::OrdersController < Admin::BaseController
                    .page(params[:page])
                    .per(20)
 
-    if params[:status].present?
-      @orders = @orders.where(status: params[:status])
-    end
+    return if params[:status].blank?
+
+    @orders = @orders.where(status: params[:status])
   end
 
   def show

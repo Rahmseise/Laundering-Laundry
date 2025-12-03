@@ -1,13 +1,16 @@
 class ProfilesController < ApplicationController
   before_action :authenticate_user!
   before_action :redirect_if_admin
-  before_action :set_customer, only: [:show, :edit, :update]
+  before_action :set_customer, only: %i[show edit update]
 
-  def show
-  end
+  def show; end
 
   def new
     @customer = current_user.build_customer
+    @provinces = Province.all
+  end
+
+  def edit
     @provinces = Province.all
   end
 
@@ -20,12 +23,8 @@ class ProfilesController < ApplicationController
     else
       @provinces = Province.all
       flash.now[:alert] = "Error creating profile."
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
-  end
-
-  def edit
-    @provinces = Province.all
   end
 
   def update
@@ -35,17 +34,17 @@ class ProfilesController < ApplicationController
     else
       @provinces = Province.all
       flash.now[:alert] = "Error updating profile."
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 
   private
 
   def redirect_if_admin
-    if current_user.admin?
-      flash[:alert] = "Admin users don't have customer profiles."
-      redirect_to admin_root_path
-    end
+    return unless current_user.admin?
+
+    flash[:alert] = "Admin users don't have customer profiles."
+    redirect_to admin_root_path
   end
 
   def set_customer
@@ -53,9 +52,9 @@ class ProfilesController < ApplicationController
   end
 
   def customer_params
-    params.require(:customer).permit(
-      :first_name, :last_name, :phone,
-      :address, :city, :province_id, :postal_code
+    params.expect(
+      customer: %i[first_name last_name phone
+                   address city province_id postal_code]
     )
   end
 end

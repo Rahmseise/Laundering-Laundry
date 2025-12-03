@@ -12,7 +12,7 @@ class Product < ApplicationRecord
   validates :stock_quantity, presence: true, numericality: { greater_than_or_equal_to: 0 }
 
   scope :on_sale, -> { where(on_sale: true) }
-  scope :new_products, -> { where('created_at >= ?', 3.days.ago) }
+  scope :new_products, -> { where(created_at: 3.days.ago..) }
   scope :recently_updated, -> { where('updated_at >= ? AND created_at < ?', 3.days.ago, 3.days.ago) }
   scope :in_stock, -> { where('stock_quantity > ?', 0) }
 

@@ -21,7 +21,7 @@ class OrdersController < ApplicationController
 
     @customer = current_user.customer
     @order = Order.new(customer: @customer, province: @customer.province)
-    @subtotal = @cart_items.sum { |item| item.subtotal }
+    @subtotal = @cart_items.sum(&:subtotal)
     @tax_amount = @subtotal * (@customer.province.total_tax_rate / 100)
     @total = @subtotal + @tax_amount
   end
@@ -70,7 +70,7 @@ class OrdersController < ApplicationController
       flash[:notice] = "Order placed successfully!"
       redirect_to order_path(@order)
     end
-  rescue => e
+  rescue StandardError => e
     flash[:alert] = "Error processing order: #{e.message}"
     redirect_to new_order_path
   end
@@ -78,13 +78,13 @@ class OrdersController < ApplicationController
   private
 
   def ensure_customer_profile
-    unless current_user.customer.present?
-      flash[:alert] = "Please complete your profile before placing orders."
-      redirect_to new_profile_path
-    end
+    return if current_user.customer.present?
+
+    flash[:alert] = "Please complete your profile before placing orders."
+    redirect_to new_profile_path
   end
 
   def order_params
-    params.require(:order).permit(:shipping_address) if params[:order].present?
+    params.expect(order: [:shipping_address]) if params[:order].present?
   end
 end

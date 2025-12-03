@@ -1,9 +1,9 @@
 class Admin::CustomersController < Admin::BaseController
   def index
     @customers = Customer.includes(:user, :province)
-                        .order(created_at: :desc)
-                        .page(params[:page])
-                        .per(20)
+                         .order(created_at: :desc)
+                         .page(params[:page])
+                         .per(20)
   end
 
   def show

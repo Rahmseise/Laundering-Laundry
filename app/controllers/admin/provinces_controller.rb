@@ -1,12 +1,11 @@
 class Admin::ProvincesController < Admin::BaseController
-  before_action :set_province, only: [:edit, :update]
+  before_action :set_province, only: %i[edit update]
 
   def index
-    @provinces = Province.all.order(:name)
+    @provinces = Province.order(:name)
   end
 
-  def edit
-  end
+  def edit; end
 
   def update
     if @province.update(province_params)
@@ -14,7 +13,7 @@ class Admin::ProvincesController < Admin::BaseController
       redirect_to admin_provinces_path
     else
       flash.now[:alert] = "Error updating tax rates."
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 
@@ -25,6 +24,6 @@ class Admin::ProvincesController < Admin::BaseController
   end
 
   def province_params
-    params.require(:province).permit(:gst_rate, :pst_rate, :hst_rate)
+    params.expect(province: %i[gst_rate pst_rate hst_rate])
   end
 end

@@ -1,28 +1,31 @@
 class Admin::ProductsController < Admin::BaseController
-  before_action :set_product, only: [:show, :edit, :update, :destroy]
+  before_action :set_product, only: %i[show edit update destroy]
 
   def index
     @products = Product.includes(:category)
-                      .order(created_at: :desc)
-                      .page(params[:page])
-                      .per(20)
+                       .order(created_at: :desc)
+                       .page(params[:page])
+                       .per(20)
 
     if params[:search].present?
       @products = @products.where('name ILIKE ? OR description ILIKE ?',
-                                 "%#{params[:search]}%",
-                                 "%#{params[:search]}%")
+                                  "%#{params[:search]}%",
+                                  "%#{params[:search]}%")
     end
 
-    if params[:category_id].present?
-      @products = @products.where(category_id: params[:category_id])
-    end
+    return if params[:category_id].blank?
+
+    @products = @products.where(category_id: params[:category_id])
   end
 
-  def show
-  end
+  def show; end
 
   def new
     @product = Product.new
+    @categories = Category.all
+  end
+
+  def edit
     @categories = Category.all
   end
 
@@ -35,12 +38,8 @@ class Admin::ProductsController < Admin::BaseController
     else
       @categories = Category.all
       flash.now[:alert] = "Error creating product."
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
-  end
-
-  def edit
-    @categories = Category.all
   end
 
   def update
@@ -50,7 +49,7 @@ class Admin::ProductsController < Admin::BaseController
     else
       @categories = Category.all
       flash.now[:alert] = "Error updating product."
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 
@@ -67,9 +66,9 @@ class Admin::ProductsController < Admin::BaseController
   end
 
   def product_params
-    params.require(:product).permit(
-      :name, :description, :price, :sale_price, :on_sale,
-      :sku, :stock_quantity, :category_id, images: []
+    params.expect(
+      product: [:name, :description, :price, :sale_price, :on_sale,
+                :sku, :stock_quantity, :category_id, { images: [] }]
     )
   end
 end

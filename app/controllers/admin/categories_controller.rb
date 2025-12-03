@@ -1,13 +1,15 @@
 class Admin::CategoriesController < Admin::BaseController
-  before_action :set_category, only: [:edit, :update, :destroy]
+  before_action :set_category, only: %i[edit update destroy]
 
   def index
-    @categories = Category.all.order(:name)
+    @categories = Category.order(:name)
   end
 
   def new
     @category = Category.new
   end
+
+  def edit; end
 
   def create
     @category = Category.new(category_params)
@@ -17,11 +19,8 @@ class Admin::CategoriesController < Admin::BaseController
       redirect_to admin_categories_path
     else
       flash.now[:alert] = "Error creating category."
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
-  end
-
-  def edit
   end
 
   def update
@@ -30,7 +29,7 @@ class Admin::CategoriesController < Admin::BaseController
       redirect_to admin_categories_path
     else
       flash.now[:alert] = "Error updating category."
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 
@@ -52,6 +51,6 @@ class Admin::CategoriesController < Admin::BaseController
   end
 
   def category_params
-    params.require(:category).permit(:name, :description, :image)
+    params.expect(category: %i[name description image])
   end
 end

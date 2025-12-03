@@ -3,6 +3,6 @@ class CartsController < ApplicationController
 
   def show
     @cart_items = current_user.cart_items.includes(:product)
-    @subtotal = @cart_items.sum { |item| item.subtotal }
+    @subtotal = @cart_items.sum(&:subtotal)
   end
 end
