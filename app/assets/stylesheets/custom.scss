@@ -1,159 +1,29 @@
 // Variables
 $primary-color: #2563EB;
 $secondary-color: #1F2937;
-$success-color: #10B981;
-$danger-color: #EF4444;
-$warning-color: #F59E0B;
-$gray-light: #F3F4F6;
-$gray-dark: #374151;
-
-$base-spacing: 1rem;
-$border-radius: 0.5rem;
 
 // Mixins
-@mixin button-style($bg-color, $hover-color) {
+@mixin button-style($bg-color) {
   background-color: $bg-color;
-  padding: $base-spacing * 0.5 $base-spacing;
-  border-radius: $border-radius;
-  transition: all 0.3s ease;
-
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
   &:hover {
-    background-color: $hover-color;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: darken($bg-color, 10%);
   }
 }
 
-@mixin card-style {
-  background-color: white;
-  border-radius: $border-radius;
-  padding: $base-spacing * 1.5;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-// Nesting and Inheritance
+// Nesting
 .product-card {
-  @include card-style;
-  transition: all 0.3s ease;
-
-  &:hover {
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-    transform: translateY(-5px);
-
-    .product-image {
-      opacity: 0.9;
-    }
-  }
-
+  background: white;
   .product-title {
     font-size: 1.125rem;
-    font-weight: 600;
-    color: $secondary-color;
-    margin-bottom: $base-spacing * 0.5;
-
     &:hover {
       color: $primary-color;
     }
   }
-
-  .product-price {
-    color: $secondary-color;
-    font-weight: bold;
-    font-size: 1.25rem;
-
-    &.on-sale {
-      color: $danger-color;
-    }
-  }
-
-  .product-category {
-    color: $gray-dark;
-    font-size: 0.875rem;
-  }
-}
-
-// Button styles using mixins
-.btn-primary {
-  @include button-style($primary-color, darken($primary-color, 10%));
-  color: white;
-}
-
-.btn-success {
-  @include button-style($success-color, darken($success-color, 10%));
-  color: white;
-}
-
-.btn-danger {
-  @include button-style($danger-color, darken($danger-color, 10%));
-  color: white;
 }
 
 // Operators
-.container-custom {
-  max-width: 1200px;
-  padding: 0 ($base-spacing * 2);
-  margin: 0 auto;
-}
-
-.grid-spacing {
-  gap: $base-spacing * 1.5;
-}
-
-// Admin sidebar styling with nesting
-.admin-sidebar {
-  background-color: $secondary-color;
-
-  .nav-link {
-    padding: $base-spacing * 0.75 $base-spacing * 1.5;
-    color: rgba(255, 255, 255, 0.8);
-    transition: all 0.2s;
-
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-      color: white;
-    }
-
-    &.active {
-      background-color: rgba(255, 255, 255, 0.15);
-      color: white;
-      border-left: 4px solid $primary-color;
-    }
-  }
-}
-
-// Responsive spacing with operators
-@media (min-width: 768px) {
-  .container-custom {
-    padding: 0 ($base-spacing * 3);
-  }
-
-  .grid-spacing {
-    gap: $base-spacing * 2;
-  }
-}
-
-// Status badges using inheritance
-%badge-base {
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.badge-success {
-  @extend %badge-base;
-  background-color: lighten($success-color, 40%);
-  color: darken($success-color, 20%);
-}
-
-.badge-warning {
-  @extend %badge-base;
-  background-color: lighten($warning-color, 40%);
-  color: darken($warning-color, 30%);
-}
-
-.badge-danger {
-  @extend %badge-base;
-  background-color: lighten($danger-color, 40%);
-  color: darken($danger-color, 20%);
+.container {
+  padding: 0 (1rem * 2);
 }
