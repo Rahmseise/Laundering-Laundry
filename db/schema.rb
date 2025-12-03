@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_02_182330) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_03_194754) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -88,7 +88,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_02_182330) do
 
   create_table "orders", force: :cascade do |t|
     t.bigint "customer_id", null: false
-    t.string "status"
+    t.string "status", default: "0"
     t.decimal "total"
     t.decimal "subtotal"
     t.decimal "tax_amount"

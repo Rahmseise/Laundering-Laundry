@@ -3,9 +3,8 @@ class Order < ApplicationRecord
   belongs_to :province
   has_many :order_items, dependent: :destroy
 
-  enum :status, { pending: 0, paid: 1, shipped: 2, delivered: 3, cancelled: 4 }, default: :pending
+  enum :status, { pending: 0, paid: 1, shipped: 2, delivered: 3, cancelled: 4 }
 
-  validates :status, presence: true
   validates :total, :subtotal, :tax_amount, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
 
   # Add scopes for each status
@@ -15,11 +14,11 @@ class Order < ApplicationRecord
   scope :delivered, -> { where(status: :delivered) }
   scope :cancelled, -> { where(status: :cancelled) }
 
+  before_validation :set_default_status, on: :create
   before_save :calculate_totals
-  after_initialize :set_default_status, if: :new_record?
 
   def set_default_status
-    self.status ||= :pending
+    self.status = :pending if status.nil?
   end
 
   def calculate_totals
