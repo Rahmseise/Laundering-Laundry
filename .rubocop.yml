@@ -13,6 +13,7 @@ AllCops:
     - 'public/**/*'
     - 'test/**/*'
     - 'spec/**/*'
+
 # to use run: bundle exec rubocop
 # Use plugins instead of require
 plugins:
