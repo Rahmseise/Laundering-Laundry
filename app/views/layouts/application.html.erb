@@ -75,7 +75,7 @@
           <%= link_to "My Profile", profile_path, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
           <%= link_to "My Orders", orders_path, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
         <% end %>
-        <%= link_to "Logout", destroy_user_session_path, data: { turbo_method: :delete }, class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
+        <%= button_to "Logout", destroy_user_session_path, method: :delete, class: "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 border-0 bg-transparent cursor-pointer" %>
       </div>
     </div>
 
